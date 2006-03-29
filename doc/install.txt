@@ -1,0 +1,35 @@
+
+ 1. Activate extension
+******************************
+
+Activate the changelog extension. If you don't know how to do this, read 
+http://ez.no/doc/ez_publish/technical_manual/3_6/installation/extensions/activating_the_extension.
+
+
+ 2. Add overrides
+******************************
+
+You can use the modified templates in this extension to override content/versions.tpl 
+and content/edit_draft.tpl in the admin layout.
+
+Use these templates only for classes which have an attribute with identifier "changelog" with the datatype changelog.
+
+An example override for a class with identifier "changelog_test":
+
+[versions_class_changelog_test]
+Source=content/versions.tpl
+MatchFile=content/versions_changelog.tpl
+Subdir=templates
+Match[class_identifier]=changelog_test
+
+[edit_draft_class_changelog_test]
+Source=content/edit_draft.tpl
+MatchFile=content/edit_draft_changelog.tpl
+Subdir=templates
+Match[class_identifier]=changelog_test
+
+
+ 3. Clear caches
+******************************
+
+You will probably need to clear the template caches.
