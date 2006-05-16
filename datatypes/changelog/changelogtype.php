@@ -24,28 +24,54 @@ class ChangelogType extends eZTextType
         {
             if ( $originalContentObjectAttribute->attribute( 'id' ) == $contentObjectAttribute->attribute( 'id' ) )
             {
+                // new version of an existing language
                 include_once( 'kernel/classes/ezcontentobjectversion.php' );
 
                 $objectVersion = eZContentObjectVersion::fetchVersion( $originalContentObjectAttribute->attribute( 'version' ), $originalContentObjectAttribute->attribute( 'contentobject_id' ) );
 
-                eZDebug::writeDebug( $objectVersion->attribute( 'status' ), 'changelog::initializeObjectAttribute() original version status' );
-
-                $dataText = ezi18n( 'kernel/classes/datatypes', '- based on version %version', '', array( '%version' => $originalContentObjectAttribute->attribute( 'version' ) ) );
-
-                $doNotCopyChangelog = array( EZ_VERSION_STATUS_PUBLISHED, 
-                                             EZ_VERSION_STATUS_ARCHIVED );
-
-                if ( !in_array( $objectVersion->attribute( 'status' ), $doNotCopyChangelog ) )
+                $newObjectVersion =& $contentObjectAttribute->attribute( 'object_version' );
+                if ( $contentObjectAttribute->attribute( 'language_id' ) != $newObjectVersion->attribute( 'initial_language_id' ) )
                 {
-                    $dataText = $dataText . "\r\n" . $originalContentObjectAttribute->attribute( "data_text" );
+                    // not the edited language
+                    eZDebug::writeDebug( 'not the edited language', 'changelog::initializeObjectAttribute()' );
+                    $dataText = ezi18n( 'kernel/classes/datatypes', '- copy of %version', '', array( '%version' => $originalContentObjectAttribute->attribute( 'version' ) ) );
+                }
+                else
+                {
+                    // the edited language
+                    eZDebug::writeDebug( 'the edited language', 'changelog::initializeObjectAttribute()' );
+                    eZDebug::writeDebug( $objectVersion->attribute( 'status' ), 'changelog::initializeObjectAttribute() original version status' );
+
+                    $dataText = ezi18n( 'kernel/classes/datatypes', '- based on version %version', '', array( '%version' => $originalContentObjectAttribute->attribute( 'version' ) ) );
+
+                    $doNotCopyChangelog = array( EZ_VERSION_STATUS_PUBLISHED, 
+                                                 EZ_VERSION_STATUS_ARCHIVED );
+
+                    if ( !in_array( $objectVersion->attribute( 'status' ), $doNotCopyChangelog ) )
+                    {
+                        $dataText = $dataText . "\r\n" . $originalContentObjectAttribute->attribute( "data_text" );
+                    }
                 }
 
                 $contentObjectAttribute->setAttribute( "data_text", $dataText );
             }
             else
             {
-                $dataText = $originalContentObjectAttribute->attribute( "data_text" );
-                $contentObjectAttribute->setAttribute( "data_text", $dataText );
+                if ( $originalContentObjectAttribute->attribute( 'contentobject_id' ) == $contentObjectAttribute->attribute( 'contentobject_id' ) )
+                {
+                    // translation to a new language
+                    eZDebug::writeDebug( 'translation to a new language', 'changelog::initializeObjectAttribute()' );
+                    $dataText = ezi18n( 'kernel/classes/datatypes', '- translation based on %version', '', array( '%version' => $originalContentObjectAttribute->attribute( 'version' ) ) );
+
+                    $contentObjectAttribute->setAttribute( "data_text", $dataText );
+                }
+                else
+                {
+                    // a copy
+                    eZDebug::writeDebug( 'copy of an object', 'changelog::initializeObjectAttribute()' );
+                    $dataText = $originalContentObjectAttribute->attribute( "data_text" );
+                    $contentObjectAttribute->setAttribute( "data_text", $dataText );
+                }
             }
         }
 
