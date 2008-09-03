@@ -1,14 +1,10 @@
 <?php
 
-include_once( 'kernel/classes/datatypes/eztext/eztexttype.php' );
-
-define( "EZ_DATATYPESTRING_CHANGELOG", "changelog" );
-
 class ChangelogType extends eZTextType
 {
     function ChangelogType()
     {
-        $this->eZDataType( EZ_DATATYPESTRING_CHANGELOG, ezi18n( 'kernel/classes/datatypes', "Changelog", 'Datatype name' ),
+        $this->eZDataType( 'changelog', ezi18n( 'kernel/classes/datatypes', 'Changelog', 'Datatype name' ),
                            array( 'serialize_supported' => true,
                                   'object_serialize_map' => array( 'data_text' => 'text' ) ) );
     }
@@ -16,7 +12,7 @@ class ChangelogType extends eZTextType
     /*!
      Sets the default value.
     */
-    function initializeObjectAttribute( &$contentObjectAttribute, $currentVersion, &$originalContentObjectAttribute )
+    function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         eZDebug::writeDebug( $currentVersion, 'changelog::initializeObjectAttribute() current version' );
 
@@ -25,11 +21,9 @@ class ChangelogType extends eZTextType
             if ( $originalContentObjectAttribute->attribute( 'id' ) == $contentObjectAttribute->attribute( 'id' ) )
             {
                 // new version of an existing language
-                include_once( 'kernel/classes/ezcontentobjectversion.php' );
-
                 $objectVersion = eZContentObjectVersion::fetchVersion( $originalContentObjectAttribute->attribute( 'version' ), $originalContentObjectAttribute->attribute( 'contentobject_id' ) );
 
-                $newObjectVersion =& $contentObjectAttribute->attribute( 'object_version' );
+                $newObjectVersion = $contentObjectAttribute->attribute( 'object_version' );
                 if ( $contentObjectAttribute->attribute( 'language_id' ) != $newObjectVersion->attribute( 'initial_language_id' ) )
                 {
                     // not the edited language
@@ -44,8 +38,8 @@ class ChangelogType extends eZTextType
 
                     $dataText = ezi18n( 'kernel/classes/datatypes', '- based on version %version', '', array( '%version' => $originalContentObjectAttribute->attribute( 'version' ) ) );
 
-                    $doNotCopyChangelog = array( EZ_VERSION_STATUS_PUBLISHED, 
-                                                 EZ_VERSION_STATUS_ARCHIVED );
+                    $doNotCopyChangelog = array( eZContentObjectVersion::STATUS_PUBLISHED,
+                                                 eZContentObjectVersion::STATUS_ARCHIVED );
 
                     if ( !in_array( $objectVersion->attribute( 'status' ), $doNotCopyChangelog ) )
                     {
@@ -53,7 +47,7 @@ class ChangelogType extends eZTextType
                     }
                 }
 
-                $contentObjectAttribute->setAttribute( "data_text", $dataText );
+                $contentObjectAttribute->setAttribute( 'data_text', $dataText );
             }
             else
             {
@@ -63,22 +57,22 @@ class ChangelogType extends eZTextType
                     eZDebug::writeDebug( 'translation to a new language', 'changelog::initializeObjectAttribute()' );
                     $dataText = ezi18n( 'kernel/classes/datatypes', '- translation based on %version', '', array( '%version' => $originalContentObjectAttribute->attribute( 'version' ) ) );
 
-                    $contentObjectAttribute->setAttribute( "data_text", $dataText );
+                    $contentObjectAttribute->setAttribute( 'data_text', $dataText );
                 }
                 else
                 {
                     // a copy
                     eZDebug::writeDebug( 'copy of an object', 'changelog::initializeObjectAttribute()' );
-                    $dataText = $originalContentObjectAttribute->attribute( "data_text" );
-                    $contentObjectAttribute->setAttribute( "data_text", $dataText );
+                    $dataText = $originalContentObjectAttribute->attribute( 'data_text' );
+                    $contentObjectAttribute->setAttribute( 'data_text', $dataText );
                 }
             }
         }
 
-        $contentClassAttribute =& $contentObjectAttribute->contentClassAttribute();
-        if ( $contentClassAttribute->attribute( "data_int1" ) == 0 )
+        $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
+        if ( $contentClassAttribute->attribute( 'data_int1' ) == 0 )
         {
-            $contentClassAttribute->setAttribute( "data_int1", 10 );
+            $contentClassAttribute->setAttribute( 'data_int1', 10 );
             $contentClassAttribute->store();
         }
     }
@@ -100,6 +94,6 @@ class ChangelogType extends eZTextType
 
 }
 
-eZDataType::register( EZ_DATATYPESTRING_CHANGELOG, "changelogtype" );
+eZDataType::register( 'changelog', 'changelogtype' );
 
 ?>
