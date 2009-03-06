@@ -1,7 +1,7 @@
 <?php
 class changelogInfo
 {
-    function info()
+    static function info()
     {
         return array(
             'Name' => "changelog",
